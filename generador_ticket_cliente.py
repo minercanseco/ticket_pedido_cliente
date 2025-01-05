@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+import urllib.parse
+
 
 class GeneradorTicketCliente:
     def __init__(self, ancho_max=32):
@@ -324,6 +326,7 @@ class GeneradorTicketCliente:
         elif sys.platform == "win32":  # Windows
             # En Windows, no podemos copiar el archivo directamente al portapapeles con facilidad.
             # Vamos a copiar solo la ruta del archivo al portapapeles usando pyperclip.
+            file_path = self.url_to_windows_path(file_path)
             import pyperclip
             try:
                 pyperclip.copy(file_path)
@@ -332,3 +335,19 @@ class GeneradorTicketCliente:
                 print("Error al intentar copiar la ruta del archivo al portapapeles en Windows.")
         else:
             print(f"El sistema operativo {sys.platform} no es compatible con esta función.")
+
+    def url_to_windows_path(self, url):
+        try:
+            # Remover el prefijo "file:///"
+            if url.startswith("file:///"):
+                url = url[8:]  # Remueve "file://"
+
+            # Decodificar caracteres escapados (%20 -> espacio, etc.)
+            path = urllib.parse.unquote(url)
+
+            # Convertir las barras inclinadas (/) en barras invertidas (\)
+            windows_path = path.replace("/", "\\")
+            return windows_path
+        except Exception as e:
+            print(f"Error al convertir la URL a ruta de Windows: {e}")
+            return None

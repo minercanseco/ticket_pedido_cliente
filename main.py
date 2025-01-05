@@ -6,8 +6,8 @@ from cayal.util import Utilerias
 if __name__ == '__main__':
 
     parametros = ParametrosContpaqi()
-    parametros.cadena_conexion = 'Mac'
-    parametros.id_principal = 32
+    #parametros.base_de_datos = 'ComercialSP'
+    #parametros.id_principal = 155
 
     base_de_datos = ComandosBaseDatos(parametros.cadena_conexion)
     utilerias = Utilerias()
