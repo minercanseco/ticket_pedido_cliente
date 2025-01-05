@@ -20,6 +20,7 @@ class TicketPedidoCliente:
         self._info_pedido = None
 
         self._generar_ticket()
+        self._afectar_bitacora()
 
     def _generar_ticket(self):
         self._info_pedido = self._buscar_info_pedido()
@@ -109,3 +110,10 @@ class TicketPedidoCliente:
         self._ticket.productos = partidas_con_impuestos
         self._ticket.total = total_documento
 
+    def _afectar_bitacora(self):
+        user_name = self._base_de_datos.buscar_nombre_de_usuario(self._user_id)
+        comentario = f'Ticket cliente generado por: {user_name}'
+        self._base_de_datos.insertar_registro_bitacora_pedidos(self._order_document_id,
+                                                               11,
+                                                               self._user_id,
+                                                               comments=comentario)

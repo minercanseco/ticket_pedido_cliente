@@ -351,3 +351,4 @@ class GeneradorTicketCliente:
         except Exception as e:
             print(f"Error al convertir la URL a ruta de Windows: {e}")
             return None
+
