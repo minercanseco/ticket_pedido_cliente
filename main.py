@@ -1,5 +1,15 @@
 from ticket_pedido_cliente import TicketPedidoCliente
-
+from cayal.comandos_base_datos import ComandosBaseDatos
+from cayal.parametros_contpaqi import ParametrosContpaqi
+from cayal.util import Utilerias
 
 if __name__ == '__main__':
-    ticket = TicketPedidoCliente()
+
+    parametros = ParametrosContpaqi()
+    parametros.cadena_conexion = 'Mac'
+    parametros.id_principal = 32
+
+    base_de_datos = ComandosBaseDatos(parametros.cadena_conexion)
+    utilerias = Utilerias()
+
+    ticket = TicketPedidoCliente(base_de_datos, utilerias, parametros)
