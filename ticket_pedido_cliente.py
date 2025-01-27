@@ -48,7 +48,7 @@ class TicketPedidoCliente:
     def _settear_valores_ticket(self, info_pedido):
 
 
-        self._ticket.cliente = info_pedido.get('OfficialName', '')
+        self._ticket.cliente = info_pedido.get('OfficialName', '').strip().replace('\n', '').replace(' ', '')
         self._ticket.pedido = info_pedido.get('DocFolio', '')
         self._ticket.tipo = info_pedido.get('DocumentType', '')
 
