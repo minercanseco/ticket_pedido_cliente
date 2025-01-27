@@ -88,7 +88,7 @@ class TicketPedidoCliente:
             self._ticket.colonia = colonia if colonia else ''
 
         consulta_partidas = self._base_de_datos.buscar_partidas_pedidos_produccion_cayal(
-            self._order_document_id, partidas_eliminadas=False)
+            self._order_document_id, partidas_eliminadas=False, partidas_producidas=True)
 
 
         self._procesar_partidas(consulta_partidas)

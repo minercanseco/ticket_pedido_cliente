@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
     parametros = ParametrosContpaqi()
     #parametros.base_de_datos = 'ComercialSP'
-    #parametros.id_principal = 155
+    #parametros.id_principal = 2490
 
     base_de_datos = ComandosBaseDatos(parametros.cadena_conexion)
     utilerias = Utilerias()
