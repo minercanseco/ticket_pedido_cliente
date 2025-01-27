@@ -24,6 +24,15 @@ class GeneradorTicketCliente:
         self._total = 0
         self._comentario = ''
         self._forma_pago = ''
+        self._forma_pago_id = 0
+
+    @property
+    def forma_pago_id(self):
+        return self._forma_pago_id
+
+    @forma_pago_id.setter
+    def forma_pago_id(self, value):
+        self._forma_pago_id = value
 
     @property
     def comentario(self):
@@ -284,8 +293,148 @@ class GeneradorTicketCliente:
         # Retornar el HTML completo
         return encabezado + cuerpo + footer
 
+    def generar_ticket_transferencia(self):
+        # Crear el encabezado del ticket
+        encabezado = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ticket de Venta</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                margin: 0;
+                padding: 0;
+            }}
+            .ticket {{
+                max-width: 300px;
+                margin: 0 auto;
+                border: 1px solid #000;
+                padding: 10px;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            }}
+            .separator {{
+                border-top: 1px dashed #000;
+                margin: 10px 0;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+            }}
+            table th, table td {{
+                text-align: left;
+                padding: 5px;
+            }}
+            table th {{
+                border-bottom: 1px solid #000;
+            }}
+            .observacion {{
+                font-size: 10px; /* Tamaño de fuente 8px */
+                color: #000000; /* Color negro */
+                font-weight: bold; /* Negritas */
+                margin-top: 5px;
+            }}
+            .footer {{
+                text-align: center;
+                margin-top: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+    <div class="ticket">
+        <div class="header" style="text-align: center;">
+        <img src="data:image/png;base64, {self._icono_cayal()}" alt="Imagen" style="max-width: 100%; height: auto;">
+            <p><strong>{self.cliente}</strong></p>
+            <p><strong>FOLIO:</strong> {self.pedido}</p>
+            <p><strong>TIPO PEDIDO:</strong> {self._tipo}</p>
+            <p><strong>VENTA:</strong> {self.venta}</p>
+            <p><strong>ENTREGA:</strong> {self.entrega}</p>
+            <p><strong>CAPTURISTA:</strong> {self.capturista}</p>
+             <p><strong>FORMA PAGO:</strong> {self.forma_pago}</p>
+            <p><strong>DIRECCIÓN:</strong></p>
+            <p>{self.calle} {self.numero}, {self.colonia}</p>
+        </div>
+        <div class="separator"></div>
+        <p>{self.comentario}</p>
+        <div class="separator"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Cantidad</th>
+                    <th>Unidad</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Total</th> <!-- Nueva columna Total -->
+                </tr>
+            </thead>
+            <tbody>
+    """
+
+        # Crear el cuerpo del ticket
+        total_general = 0  # Variable para acumular el total general
+        cuerpo = ""
+        for producto in self.productos:
+            cantidad = producto['cantidad']
+            unidad = producto['ClaveUnidad']
+            descripcion = producto['ProductName']
+            precio = producto.get('precio', 0.00)
+            total_producto = cantidad * precio  # Calcular el total por producto
+            total_general += total_producto  # Acumular el total general
+
+            observacion = producto.get("Comments", "").replace('\n', '').replace('\r', '').strip()
+            observacion = observacion.replace('ESPECIFICACIÓN:', '').strip()
+
+            # Fila del producto
+            cuerpo += f"""
+                <tr>
+                    <td>{cantidad}</td>
+                    <td>{unidad}</td>
+                    <td>{descripcion}</td>
+                    <td style="text-align: right;">${precio:.2f}</td>
+                    <td style="text-align: right;">${total_producto:.2f}</td> <!-- Total por producto -->
+                </tr>
+            """
+            # Observación debajo del producto (si existe)
+            if observacion:
+                cuerpo += f"""
+                <tr>
+                    <td colspan="5" class="observacion">OBS: {observacion}</td>
+                </tr>
+                """
+            # Separador entre productos
+            cuerpo += """
+                <tr>
+                    <td colspan="5"><div class="separator"></div></td>
+                </tr>
+            """
+
+        # Crear el pie del ticket con el total
+        footer = f"""
+            </tbody>
+        </table>
+        <div class="separator"></div>
+        
+        <div class="separator"></div>
+        <div class="footer">
+            <p><strong><em>Nota:</em></strong> <em>El monto es aproximado, ya que los productos de gramaje pueden variar el total al momento de surtir el pedido.</em></p>
+            <p><strong><em>Nota:</em></strong> <em>Este documento es una orden de pedido y no es un comprobante fiscal.</em></p>
+            <p><strong><em>Gracias por su preferencia.</em></strong></p>
+        </div>
+    </div>
+    </body>
+    </html>
+    """
+
+        # Retornar el HTML completo
+        return encabezado + cuerpo + footer
+
+
     def _nombre_archivo(self):
-        return f"{self.cliente}_{self.pedido}.html"
+        cliente = self.cliente.strip().replace('\n', '').replace(' ', '')
+        return f"{cliente}_{self.pedido}.html"
 
     def guardar_archivo(self):
         # Verifica y ajusta la ruta del archivo
@@ -294,7 +443,7 @@ class GeneradorTicketCliente:
         self._ruta_archivo = os.path.join(directorio, nombre_archivo)
 
         # Generar ticket y guardarlo
-        ticket = self.generar_ticket()
+        ticket = self.generar_ticket() if self.forma_pago_id != 6 else self.generar_ticket_transferencia()
         try:
             with open(self._ruta_archivo, "w", encoding="utf-8") as file:
                 file.write(ticket)

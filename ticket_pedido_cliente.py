@@ -47,10 +47,10 @@ class TicketPedidoCliente:
 
     def _settear_valores_ticket(self, info_pedido):
 
-
-        self._ticket.cliente = info_pedido.get('OfficialName', '').strip().replace('\n', '').replace(' ', '')
+        self._ticket.cliente = info_pedido.get('OfficialName', '')#.strip().replace('\n', '').replace(' ', '')
         self._ticket.pedido = info_pedido.get('DocFolio', '')
         self._ticket.tipo = info_pedido.get('DocumentType', '')
+        self._ticket.forma_pago_id = info_pedido.get('WayToPayID',1)
 
         fecha_captura = info_pedido.get('CreatedOn', '')
         hora_captura = info_pedido.get('CreatedOnTime', '')
